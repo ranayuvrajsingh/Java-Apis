@@ -1,10 +1,23 @@
 package com.extampz.challengeapp;
 
+
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+
+@Entity
 public class Challenge {
+    @Id
     private int challengeId;
+
+ 
+    private String challengeMonth;
+
     private String challengeName;
     private String challengeDescription;
-    private String challengeMonth;
+
+  
 
     // Default constructor
     public Challenge() {}

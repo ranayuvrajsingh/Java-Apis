@@ -59,7 +59,7 @@ public class ChallengeController {
         }
     }
  
-    @DeleteMapping("/challenges/{id}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteChallenge(@PathVariable int id) {
         boolean isChallengeDeleted = challengeService.deleteChallenge(id);
         if (isChallengeDeleted) {

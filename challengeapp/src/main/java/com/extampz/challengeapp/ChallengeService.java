@@ -1,57 +1,52 @@
 package com.extampz.challengeapp;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ChallengeService {
-  private List<Challenge> challenges = new ArrayList<>();
-  private int nextId = 1;
 
-  public ChallengeService() {
+    @Autowired
+    private ChallengeRepository challengeRepository;
+    private int nextId = 1;
 
-  }
-
-  public List<Challenge> getAllChallenges() {
-    return challenges;
-  }
-
-  public boolean createChallenge(Challenge challenge) {
-    challenge.setChallengeId(nextId++);
-    {
-      challenges.add(challenge);
-      return true;
+    public List<Challenge> getAllChallenges() {
+        return challengeRepository.findAll();
     }
-  }
 
-  public Challenge getChallenge(String month) {
-    for (Challenge challenge : challenges) {
-      if (challenge.getChallengeMonth().equalsIgnoreCase(month)) {
-        return challenge;
-
-      }
+    public boolean createChallenge(Challenge challenge) {
+        challenge.setChallengeId(nextId++);
+        challengeRepository.save(challenge);
+        return true;
     }
-    return null;
 
-  }
+    public Challenge getChallenge(String month) {
+        Optional<Challenge> challenge = challengeRepository.findByChallengeMonthIgnoreCase(month);
+        return challenge.orElse(null);
+    }
 
-  public boolean updateChallenge(int id, Challenge updateChallenge) {
-    return challenges.stream()
-        .filter(challenge -> challenge.getChallengeId() == id)
-        .findFirst()
-        .map(challenge -> {
-          challenge.setChallengeName(updateChallenge.getChallengeName());
-          challenge.setChallengeDescription(updateChallenge.getChallengeDescription());
-          challenge.setChallengeMonth(updateChallenge.getChallengeMonth());
-          return true;
-        })
-        .orElse(false);
-  }
+    public boolean updateChallenge(int id, Challenge updateChallenge) {
+        Optional<Challenge> existingChallenge = challengeRepository.findById(id);
+        if (existingChallenge.isPresent()) {
+            Challenge challengeToUpdate = existingChallenge.get();
+            challengeToUpdate.setChallengeName(updateChallenge.getChallengeName());
+            challengeToUpdate.setChallengeDescription(updateChallenge.getChallengeDescription());
+            challengeToUpdate.setChallengeMonth(updateChallenge.getChallengeMonth());
+            challengeRepository.save(challengeToUpdate);
+            return true;
+        }
+        return false;
+    }
 
-  public  boolean deleteChallenge(int id) {
-    return challenges.removeIf(challenge->challenge.getChallengeId() == id);
-  }
-
+    public boolean deleteChallenge(int id) {
+        Optional<Challenge> challenge = challengeRepository.findById(id);
+        if (challenge.isPresent()) {
+            challengeRepository.deleteById(id);
+            return true;
+        } else {
+            return false;
+        }
+    }
 }
